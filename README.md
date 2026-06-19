@@ -17,4 +17,4 @@ Clicks the color you set
   ### Linux
    `python cc.py`
   ### Windows
-    `python cc_windows.py`
+    python cc_windows.py
