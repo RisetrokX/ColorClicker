@@ -13,5 +13,8 @@ Clicks the color you set
   ### Windows
     pip install pillow
 ## Usage
-  Run the script and enjoy ColorClicker
-    `python cc.py`
+  Run the script and enjoy ColorClicker:
+  ### Linux
+   `python cc.py`
+  ### Windows
+    `python cc_windows.py`
