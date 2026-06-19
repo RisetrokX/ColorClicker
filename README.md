@@ -11,7 +11,7 @@ Clicks the color you set
     sudo apt update
     sudo apt install gnome-screenshot
   ### Windows
-    pip install pillow
+   You don't have to do anything on Windows!
 ## Usage
   Run the script and enjoy ColorClicker:
    `python cc.py`
