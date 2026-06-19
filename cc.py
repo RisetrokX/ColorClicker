@@ -1,44 +1,45 @@
 import pyautogui
-import keyboard # pip install keyboard
+from pynput import mouse, keyboard
+import time
 
-# Słownik z podstawowymi kolorami (RGB)
-COLORS = {
-    "red": (255, 0, 0),
-    "green": (0, 255, 0),
-    "blue": (0, 0, 255),
-    "white": (255, 255, 255),
-    "black": (0, 0, 0)
-}
+target_color = None
+scanning = False
 
-def get_color_at_mouse():
-    x, y = pyautogui.position()
-    return pyautogui.pixel(x, y)
+# Funkcja pobierająca kolor po kliknięciu myszą
+def on_click(x, y, button, pressed):
+    if pressed:
+        global target_color
+        target_color = pyautogui.pixel(x, y)
+        print(f"Color sampled: {target_color}")
+        return False # Zatrzymuje listener po jednym kliknięciu
 
-def scan_and_click(target_color):
-    print(f"Scanning for {target_color}...")
-    # Przeszukuje ekran (screenshot jest najszybszą metodą dla całego ekranu)
-    screen = pyautogui.screenshot()
-    width, height = screen.size
-    
-    for x in range(0, width, 5): # Co 5 pikseli dla szybkości
-        for y in range(0, height, 5):
-            if screen.getpixel((x, y)) == target_color:
-                pyautogui.click(x, y)
-                return True
-    return False
+# Funkcja sterująca skanowaniem
+def on_press(key):
+    global scanning
+    if key == keyboard.Key.space: # Używamy spacji zamiast 'r'
+        scanning = not scanning
+        print(f"Scanning: {scanning}")
 
-# Główna pętla
-print("Press 's' to sample color from mouse position, 'r' to run, 'q' to quit.")
-target = (0, 0, 0)
+# Uruchamiamy listener klawiatury
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
 
-while True:
-    if keyboard.is_pressed('s'):
-        target = get_color_at_mouse()
-        print(f"Target color sampled: {target}")
-    
-    if keyboard.is_pressed('r'):
-        if scan_and_click(target):
-            print("Clicked!")
-            
-    if keyboard.is_pressed('q'):
-        break
+print("Click anywhere to sample color. Press SPACE to toggle scanning.")
+
+try:
+    while True:
+        if scanning and target_color:
+            # Szukanie koloru na ekranie
+            location = pyautogui.locateOnScreen(target_color, confidence=0.9)
+            if location:
+                pyautogui.click(location)
+                print("Clicked target!")
+        
+        # Czekanie na próbkowanie koloru
+        if not target_color:
+            with mouse.Listener(on_click=on_click) as m_listener:
+                m_listener.join()
+        
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    print("Stopped.")
